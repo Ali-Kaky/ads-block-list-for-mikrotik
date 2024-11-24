@@ -1,0 +1,22 @@
+# Define file paths
+$InputFile = "C:\Users\yourcomputer\Documents\host.txt"  # Path to your input file 
+$OutputFile = "C:\Users\yourcomputer\Documents\blocked_ads.rsc"  # Path to save the converted .rsc file
+
+# Add the RSC header
+"ip firewall address-list" | Out-File -FilePath $OutputFile -Encoding UTF8
+
+# Process each line in the input file
+Get-Content $InputFile | ForEach-Object {
+    # Trim spaces and skip blank lines or comments
+    $Line = $_.Trim()
+    if ($Line -ne "" -and $Line -notlike "#*") {
+        # Match lines starting with "0.0.0.0" or "127.0.0.1" and extract the domain
+        if ($Line -match "^(?:0\.0\.0\.0|127\.0\.0\.1)\s+(.+)$") {
+            $Domain = $Matches[1]  # Extract the domain name
+            # Write the formatted MikroTik command to the output file
+            "add list=blocked_ads address=$Domain comment=`"Blocked Ads`"" | Out-File -FilePath $OutputFile -Append -Encoding UTF8
+        }
+    }
+}
+
+Write-Host "Conversion completed! Output saved to $OutputFile"
