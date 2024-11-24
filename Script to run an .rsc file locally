@@ -1,0 +1,20 @@
+:local rscFile "blocked_ads.rsc"
+:local addressList "blocked_ads"
+
+:log info "Starting RSC Import Script..."
+
+# Check if the .rsc file exists
+:if ([:len [/file find name=$rscFile]] = 0) do={
+    :log error "RSC file not found: $rscFile"
+    :error "RSC file missing."
+}
+
+# Clear the address list
+/ip firewall address-list remove [find list=$addressList]
+:log info "Cleared address list: $addressList"
+
+# Import the .rsc file
+:log info "Importing RSC file: $rscFile"
+/import file-name=$rscFile
+
+:log info "RSC Import Script Completed!"
